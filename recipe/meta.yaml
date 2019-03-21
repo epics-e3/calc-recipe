@@ -1,0 +1,36 @@
+{% set version = "3.7.1" %}
+
+package:
+  name: calc
+  version: "{{ version }}"
+
+source:
+  - url: https://github.com/epics-modules/calc/archive/R3-7-1.tar.gz
+    sha256: cb302bc87b8c3364ac332cdd70e8bbc9ac9b5cb7b31a18f815893aa2ba0c684e
+  - path: ../src
+
+build:
+  number: 0
+  run_exports:
+    - {{ pin_subpackage('calc', max_pin='x.x.x') }}
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+  host:
+    - epics-base
+    - require
+    - sscan
+    - seq
+
+test:
+  requires:
+    - run-iocsh
+  commands:
+    - run-iocsh -r calc
+
+about:
+  home: https://github.com/epics-modules/calc
+  license: EPICS Open License
+  summary: "APS BCDA synApps module: calc"
