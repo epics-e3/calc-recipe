@@ -10,7 +10,7 @@ source:
   - path: ../src
 
 build:
-  number: 2
+  number: 3
   run_exports:
     - {{ pin_subpackage('calc', max_pin='x.x.x.x') }}
 
