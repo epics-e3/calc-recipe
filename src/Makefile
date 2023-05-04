@@ -1,31 +1,6 @@
-#
-#  Copyright (c) 2017 - Present  European Spallation Source ERIC
-#
-#  The program is free software: you can redistribute
-#  it and/or modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation, either version 2 of the
-#  License, or any newer version.
-#
-#  This program is distributed in the hope that it will be useful, but WITHOUT
-#  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-#  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-#  more details.
-#
-#  You should have received a copy of the GNU General Public License along with
-#  this program. If not, see https://www.gnu.org/licenses/gpl-2.0.txt
-#
-# Author  : Jeong Han Lee
-# email   : han.lee@esss.se
-# Date    : Tuesday, September 18 11:58:13 CEST 2018
-# version : 0.0.3
-
-# LEGACY_RSET should be defined before driver.makefile
-# require-ess from 3.0.1
-LEGACY_RSET = YES
-
 where_am_I := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-
 include $(E3_REQUIRE_TOOLS)/driver.makefile
+
 
 
 APP:=calcApp
@@ -41,8 +16,10 @@ USR_CFLAGS   += -Wno-unused-but-set-variable
 USR_CPPFLAGS += -Wno-unused-variable
 USR_CPPFLAGS += -Wno-unused-function
 USR_CPPFLAGS += -Wno-unused-but-set-variable
+USR_CPPFLAGS += -DUSE_TYPED_RSET
 
 TEMPLATES += $(wildcard $(APPDB)/*.db)
+TEMPLATES += $(wildcard $(APPDB)/*.req)
 
 DBDINC_SRCS += $(APPSRC)/swaitRecord.c
 DBDINC_SRCS += $(APPSRC)/sseqRecord.c
@@ -89,11 +66,5 @@ $(DBDINC_DEPS): $(DBDINC_HDRS)
 	$(DBTORECORDTYPEH)  $(USR_DBDFLAGS) -o $@ $<
 
 
-
-# db rule is the default in RULES_E3, so add the empty one
-
-db:
-#
 .PHONY: vlibs
 vlibs:
-#

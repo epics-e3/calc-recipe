@@ -1,18 +1,19 @@
-{% set version = "3.7.1" %}
+{% set version = "3.7.4" %}
 
 package:
   name: calc
   version: "{{ version }}"
 
 source:
-  - url: https://github.com/epics-modules/calc/archive/R3-7-1.tar.gz
-    sha256: cb302bc87b8c3364ac332cdd70e8bbc9ac9b5cb7b31a18f815893aa2ba0c684e
+  - url: https://github.com/epics-modules/calc/archive/refs/tags/R3-7-4.tar.gz
+    sha256: 535b0bc7f9ea1e4aea71b6b1837ac89b16c893ca4df50504e0fccacf2e69567f
   - path: ../src
 
 build:
-  number: 3
+  number: 0
   run_exports:
     - {{ pin_subpackage('calc', max_pin='x.x.x.x') }}
+  skip: True  # [ppc64]
 
 requirements:
   build:
@@ -25,7 +26,7 @@ requirements:
     - epics-base
     - require
     - sscan
-    - seq
+    - sequencer
 
 test:
   requires:
