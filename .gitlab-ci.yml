@@ -1,3 +1,4 @@
 ---
+variables:
+  ARTIFACTORY_CONDA_CHANNEL: conda-e3-dev-virtual
 include: "https://gitlab.esss.lu.se/ics-infrastructure/gitlab-ci-yml/raw/master/E3CondaBuild.gitlab-ci.yml"
-
