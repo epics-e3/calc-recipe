@@ -10,10 +10,10 @@ source:
   - path: ../src
 
 build:
+  skip: True  # [ppc64]
   number: 0
   run_exports:
     - {{ pin_subpackage('calc', max_pin='x.x.x.x') }}
-
 
 requirements:
   build:
@@ -22,10 +22,10 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
   host:
-    - epics-base 7.0.8
-    - require 5.1.0
-    - sscan 2.11.5
-    - sequencer 2.2.9
+    - epics-base
+    - require
+    - sscan
+    - sequencer
 
 test:
   requires:
