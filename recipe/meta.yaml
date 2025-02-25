@@ -11,7 +11,7 @@ source:
 
 build:
   skip: True  # [ppc64]
-  number: 0
+  number: 1
   run_exports:
     - {{ pin_subpackage('calc', max_pin='x.x.x.x') }}
 

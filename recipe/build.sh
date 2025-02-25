@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LIBVERSION={PKG_VERSION}
+LIBVERSION=${PKG_VERSION}
 
 # Clean between variants builds
 make clean
