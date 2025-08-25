@@ -1,2 +1,5 @@
 ---
-include: "https://gitlab.esss.lu.se/ics-infrastructure/gitlab-ci-yml/raw/master/E3CondaBuild.gitlab-ci.yml"
+include:
+  - project: 'ics-infrastructure/gitlab-ci-yml'
+    ref: e3-conda-build
+    file: 'E3CondaBuild.gitlab-ci.yml'
