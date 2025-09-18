@@ -17,10 +17,11 @@ build:
 
 requirements:
   build:
-    - make
-    - perl
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ stdlib('c') }}
+    - make
+    - perl
   host:
     - epics-base
     - require
