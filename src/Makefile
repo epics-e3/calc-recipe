@@ -4,6 +4,7 @@ APP:=calcApp
 APPDB:=$(APP)/Db
 APPSRC:=$(APP)/src
 
+LIB_LIBS += sscan sequencer
 
 USR_INCLUDES += -I$(where_am_I)$(APPSRC)
 
