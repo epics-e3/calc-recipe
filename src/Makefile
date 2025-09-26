@@ -1,12 +1,10 @@
-where_am_I := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 include $(E3_REQUIRE_TOOLS)/driver.makefile
-
-
 
 APP:=calcApp
 APPDB:=$(APP)/Db
 APPSRC:=$(APP)/src
 
+LIB_LIBS += sscan sequencer
 
 USR_INCLUDES += -I$(where_am_I)$(APPSRC)
 
@@ -30,7 +28,6 @@ DBDINC_SRCS += $(APPSRC)/transformRecord.c
 DBDINC_DBDS = $(subst .c,.dbd,   $(DBDINC_SRCS:$(APPSRC)/%=%))
 DBDINC_HDRS = $(subst .c,.h,     $(DBDINC_SRCS:$(APPSRC)/%=%))
 DBDINC_DEPS = $(subst .c,$(DEP), $(DBDINC_SRCS:$(APPSRC)/%=%))
-
 
 HEADERS += $(APPSRC)/sCalcPostfix.h
 HEADERS += $(APPSRC)/aCalcPostfix.h
@@ -64,7 +61,3 @@ $(DBDINC_DEPS): $(DBDINC_HDRS)
 
 .dbd.h:
 	$(DBTORECORDTYPEH)  $(USR_DBDFLAGS) -o $@ $<
-
-
-.PHONY: vlibs
-vlibs:
