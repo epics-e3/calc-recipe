@@ -6,7 +6,7 @@ APP:=calcApp
 APPDB:=$(APP)/Db
 APPSRC:=$(APP)/src
 
-LIB_LIBS += sscan sequencer
+USR_LIBS += sscan sequencer
 
 USR_INCLUDES += -I$(where_am_I)$(APPSRC)
 
@@ -28,12 +28,10 @@ DBDINC_SRCS += $(APPSRC)/sCalcoutRecord.c
 DBDINC_SRCS += $(APPSRC)/transformRecord.c
 
 DBDINC_HDRS = $(subst .c,.h,     $(DBDINC_SRCS:$(APPSRC)/%=%))
-DBDINC_DEPS = $(subst .c,$(DEP), $(DBDINC_SRCS:$(APPSRC)/%=%))
 
 HEADERS += $(APPSRC)/sCalcPostfix.h
 HEADERS += $(APPSRC)/aCalcPostfix.h
 HEADERS += $(DBDINC_HDRS)
-
 
 SOURCES += $(APPSRC)/sCalcPostfix.c
 SOURCES += $(APPSRC)/sCalcPerform.c
@@ -55,9 +53,3 @@ SOURCES += $(DBDINC_SRCS)
 DBDS += $(APPSRC)/calcSupport_LOCAL.dbd
 DBDS += $(APPSRC)/calcSupport_withSNCSEQ.dbd
 DBDS += $(APPSRC)/calcSupport_withSSCAN.dbd
-
-
-$(DBDINC_DEPS): $(DBDINC_HDRS)
-
-.dbd.h:
-	$(DBTORECORDTYPEH)  $(USR_DBDFLAGS) -o $@ $<
