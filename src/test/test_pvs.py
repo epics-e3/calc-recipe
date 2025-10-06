@@ -19,6 +19,7 @@ LOAD_MODULE_ARG: list[str] = ["-r", "calc"]
 
 CTXT: Context = Context("pva")
 
+
 @pytest.fixture(scope="session")
 def ioc() -> Generator[IOC, None, None]:
     ioc = IOC(*STARTUP_ARGS)
@@ -27,6 +28,7 @@ def ioc() -> Generator[IOC, None, None]:
     ioc.exit()
     ioc.check_output()
     LOG.debug("IOC stderr: %s", ioc.errs)
+
 
 def test_acalcout_record_available() -> None:
     db_args: list[str] = ["-d", "acalcout_test.db"]
@@ -37,6 +39,7 @@ def test_acalcout_record_available() -> None:
     ioc.check_output()
     assert 'Record "TestLoad:WAVECreate" is of unknown type "acalcout"' not in ioc.errs
 
+
 def test_scalcout_record_available() -> None:
     db_args: list[str] = ["-d", "scalcout_test.db"]
     startup_args = LOAD_MODULE_ARG + db_args
@@ -45,6 +48,7 @@ def test_scalcout_record_available() -> None:
     ioc.exit()
     ioc.check_output()
     assert 'Record "TestLoad:SetTest" is of unknown type "scalcout"' not in ioc.errs
+
 
 def test_transform_record_available() -> None:
     db_args: list[str] = ["-d", "transform_test.db"]
@@ -62,7 +66,7 @@ class TestReadWrite:
     @pytest.mark.parametrize(
         "pv_name_read, expected_val",
         [
-            ("PREFIX:Modules", ['require', 'sequencer', 'sscan', 'calc']),
+            ("PREFIX:Modules", ["require", "sequencer", "sscan", "calc"]),
             ("TestRead:WAVE", [2.5, 2.5]),
             ("TestRead:WritedTest", "TEST 1.234"),
             ("TestRead:sumValue", 8),
