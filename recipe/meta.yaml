@@ -31,8 +31,14 @@ requirements:
 test:
   requires:
     - run-iocsh
+    - pytest
+    - p4p
+    - numpy
+  source_files:
+    - test/
   commands:
     - run-iocsh -r calc
+    - pytest -v test/
 
 about:
   home: https://github.com/epics-modules/calc
