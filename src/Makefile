@@ -1,3 +1,5 @@
+# Copyright (C) 2025  European Spallation Source ERIC
+
 include $(E3_REQUIRE_TOOLS)/driver.makefile
 
 APP:=calcApp
@@ -25,7 +27,6 @@ DBDINC_SRCS += $(APPSRC)/aCalcoutRecord.c
 DBDINC_SRCS += $(APPSRC)/sCalcoutRecord.c
 DBDINC_SRCS += $(APPSRC)/transformRecord.c
 
-DBDINC_DBDS = $(subst .c,.dbd,   $(DBDINC_SRCS:$(APPSRC)/%=%))
 DBDINC_HDRS = $(subst .c,.h,     $(DBDINC_SRCS:$(APPSRC)/%=%))
 DBDINC_DEPS = $(subst .c,$(DEP), $(DBDINC_SRCS:$(APPSRC)/%=%))
 
@@ -44,7 +45,6 @@ SOURCES += $(APPSRC)/myFreeListLib.c
 SOURCES += $(APPSRC)/devsCalcoutSoft.c
 SOURCES += $(APPSRC)/devaCalcoutSoft.c
 SOURCES += $(APPSRC)/subAve.c
-SOURCES += $(APPSRC)/swaitRecord.c
 SOURCES += $(APPSRC)/editSseq.st
 SOURCES += $(APPSRC)/interp.c
 SOURCES += $(APPSRC)/arrayTest.c

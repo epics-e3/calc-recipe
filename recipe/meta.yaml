@@ -10,14 +10,12 @@ source:
   - path: ../src
 
 build:
-  skip: True  # [ppc64]
-  number: 2
+  number: 3
   run_exports:
-    - {{ pin_subpackage('calc', max_pin='x.x.x.x') }}
+    - {{ pin_subpackage('calc', max_pin='x.x.x') }}
 
 requirements:
   build:
-    - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - {{ stdlib('c') }}
     - make
