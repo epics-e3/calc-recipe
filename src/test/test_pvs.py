@@ -68,21 +68,20 @@ dbLoadRecords("{db_file_path}")
 
 
 @pytest.fixture(scope="session")
-def running_ioc():
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp = Path(tmpdir)
+def running_ioc(tmp_path_factory):
+    tmp_path = tmp_path_factory.mktemp("ioc")
 
-        db_file = tmp / "test_read.db"
-        combined_db = "\n".join([ACALCOUT_DB, SCALCOUT_DB, TRANSFORM_DB])
-        db_file.write_text(combined_db)
+    db_file = tmp_path / "test_read.db"
+    combined_db = "\n".join([ACALCOUT_DB, SCALCOUT_DB, TRANSFORM_DB])
+    db_file.write_text(combined_db)
 
-        cmd_file = tmp / "st_test.cmd"
-        cmd_file.write_text(f"require calc\n\ndbLoadRecords('{db_file}', P=TestRead)\n")
+    cmd_file = tmp_path / "st_test.cmd"
+    cmd_file.write_text(f"require calc\n\ndbLoadRecords('{db_file}', P=TestRead)\n")
 
-        ioc = IOC(cmd_file)
-        ioc.start()
-        yield ioc
-        ioc.exit()
+    ioc = IOC(cmd_file)
+    ioc.start()
+    yield ioc
+    ioc.exit()
 
 
 @pytest.mark.usefixtures("running_ioc")
@@ -107,22 +106,19 @@ def test_read_variable(
         assert res == expected_val
 
 
-def start_and_stop_ioc(db_content: str) -> tuple[str, str]:
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmp = Path(tmpdir)
+def start_and_stop_ioc(db_content: str, tmp_path: Path) -> tuple[str, str]:
+    db_file = tmp_path / "test.db"
+    db_file.write_text(db_content)
 
-        db_file = tmp / "test.db"
-        db_file.write_text(db_content)
+    cmd_file = tmp_path / "st_test.cmd"
+    cmd_file.write_text(CMD_TEMPLATE.format(db_file_path=db_file))
 
-        cmd_file = tmp / "st_test.cmd"
-        cmd_file.write_text(CMD_TEMPLATE.format(db_file_path=db_file))
+    ioc = IOC(cmd_file)
+    ioc.start()
+    ioc.exit()
+    ioc.check_output()
 
-        ioc = IOC(cmd_file)
-        ioc.start()
-        ioc.exit()
-        ioc.check_output()
-
-        return ioc.outs, ioc.errs
+    return ioc.outs, ioc.errs
 
 
 @pytest.mark.parametrize(
@@ -133,6 +129,6 @@ def start_and_stop_ioc(db_content: str) -> tuple[str, str]:
         ("transform", TRANSFORM_DB),
     ],
 )
-def test_record_available(record_type: str, db_content: str) -> None:
-    _, stderr = start_and_stop_ioc(db_content)
+def test_record_available(record_type: str, db_content: str, tmp_path: Path):
+    _, stderr = start_and_stop_ioc(db_content, tmp_path)
     assert f'of unknown type "{record_type}"' not in stderr
