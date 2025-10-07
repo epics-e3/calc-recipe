@@ -26,7 +26,6 @@ record(waveform, "$(P=TestLoad):WAVE") {
     field(NELM, "$(SIZE=2)")
     field(FTVL, "DOUBLE")
 }
-
 """
 
 SCALCOUT_DB = """
@@ -40,7 +39,6 @@ record(scalcout, "$(P=TestLoad):SetTest") {
 
 record(stringin, "$(P=TestLoad):WritedTest") {
 }
-
 """
 
 TRANSFORM_DB = """
@@ -59,13 +57,12 @@ record(ao, "$(P=TestLoad):sumValue") {
 
 record(ao, "$(P=TestLoad):avgValue") {
 }
-
 """
 
 CMD_TEMPLATE = """
 require calc
 
-dbLoadRecords("{db_file_path}")
+dbLoadRecords("{db_file}", P={pv_prefix})
 """
 
 
@@ -78,7 +75,7 @@ def running_ioc(tmp_path_factory: pytest.TempPathFactory) -> IOC:
     db_file.write_text(combined_db)
 
     cmd_file = tmp_path / "st_test.cmd"
-    cmd_file.write_text(f"require calc\n\ndbLoadRecords('{db_file}', P=TestRead)\n")
+    cmd_file.write_text(CMD_TEMPLATE.format(db_file=db_file, pv_prefix="TestRead"))
 
     ioc = IOC(cmd_file)
     ioc.start()
@@ -107,12 +104,14 @@ def test_read_variable(
         assert res == expected_val
 
 
-def start_and_stop_ioc(db_content: str, tmp_path: Path) -> tuple[str, str]:
+def start_and_stop_ioc(
+    db_content: str, tmp_path: Path, pv_prefix: str = "TestLoad"
+) -> tuple[str, str]:
     db_file = tmp_path / "test.db"
     db_file.write_text(db_content)
 
     cmd_file = tmp_path / "st_test.cmd"
-    cmd_file.write_text(CMD_TEMPLATE.format(db_file_path=db_file))
+    cmd_file.write_text(CMD_TEMPLATE.format(db_file=db_file, pv_prefix=pv_prefix))
 
     ioc = IOC(cmd_file)
     ioc.start()
