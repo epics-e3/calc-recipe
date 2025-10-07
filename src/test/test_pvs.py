@@ -1,7 +1,9 @@
-from pathlib import Path
-import tempfile
+from __future__ import annotations
 
-from typing import Union, Sequence
+from typing import TYPE_CHECKING, Sequence
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 import numpy as np
 import pytest
@@ -68,11 +70,11 @@ dbLoadRecords("{db_file_path}")
 
 
 @pytest.fixture(scope="session")
-def running_ioc(tmp_path_factory):
+def running_ioc(tmp_path_factory: pytest.TempPathFactory) -> IOC:
     tmp_path = tmp_path_factory.mktemp("ioc")
 
     db_file = tmp_path / "test_read.db"
-    combined_db = "\n".join([ACALCOUT_DB, SCALCOUT_DB, TRANSFORM_DB])
+    combined_db = f"{ACALCOUT_DB}\n{SCALCOUT_DB}\n{TRANSFORM_DB}"
     db_file.write_text(combined_db)
 
     cmd_file = tmp_path / "st_test.cmd"
@@ -86,7 +88,7 @@ def running_ioc(tmp_path_factory):
 
 @pytest.mark.usefixtures("running_ioc")
 @pytest.mark.parametrize(
-    "pv_name_read, expected_val",
+    ("pv_name_read", "expected_val"),
     [
         ("TestRead:WAVE", [2.5, 2.5]),
         ("TestRead:WritedTest", "TEST 1.234"),
@@ -95,8 +97,7 @@ def running_ioc(tmp_path_factory):
     ],
 )
 def test_read_variable(
-    pv_name_read: str,
-    expected_val: Union[str, float, int, Sequence[float], Sequence[str]],
+    pv_name_read: str, expected_val: str | float | Sequence[float] | Sequence[str]
 ) -> None:
     res = CTXT.get(pv_name_read)
     # Handle different value types
@@ -122,13 +123,13 @@ def start_and_stop_ioc(db_content: str, tmp_path: Path) -> tuple[str, str]:
 
 
 @pytest.mark.parametrize(
-    "record_type, db_content",
+    ("record_type", "db_content"),
     [
         ("acalcout", ACALCOUT_DB),
         ("scalcout", SCALCOUT_DB),
         ("transform", TRANSFORM_DB),
     ],
 )
-def test_record_available(record_type: str, db_content: str, tmp_path: Path):
+def test_record_available(record_type: str, db_content: str, tmp_path: Path) -> None:
     _, stderr = start_and_stop_ioc(db_content, tmp_path)
     assert f'of unknown type "{record_type}"' not in stderr
