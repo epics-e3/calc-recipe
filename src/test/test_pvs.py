@@ -128,6 +128,11 @@ def start_and_stop_ioc(
         ("scalcout", SCALCOUT_DB),
         ("transform", TRANSFORM_DB),
     ],
+    ids=[
+        "acalcout",
+        "scalcout",
+        "transform",
+    ],
 )
 def test_record_available(record_type: str, db_content: str, tmp_path: Path) -> None:
     _, stderr = start_and_stop_ioc(db_content, tmp_path)
