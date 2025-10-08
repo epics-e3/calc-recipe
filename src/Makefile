@@ -1,10 +1,12 @@
+# Copyright (C) 2025  European Spallation Source ERIC
+
 include $(E3_REQUIRE_TOOLS)/driver.makefile
 
 APP:=calcApp
 APPDB:=$(APP)/Db
 APPSRC:=$(APP)/src
 
-LIB_LIBS += sscan sequencer
+USR_LIBS += sscan sequencer
 
 USR_INCLUDES += -I$(where_am_I)$(APPSRC)
 
@@ -25,14 +27,11 @@ DBDINC_SRCS += $(APPSRC)/aCalcoutRecord.c
 DBDINC_SRCS += $(APPSRC)/sCalcoutRecord.c
 DBDINC_SRCS += $(APPSRC)/transformRecord.c
 
-DBDINC_DBDS = $(subst .c,.dbd,   $(DBDINC_SRCS:$(APPSRC)/%=%))
 DBDINC_HDRS = $(subst .c,.h,     $(DBDINC_SRCS:$(APPSRC)/%=%))
-DBDINC_DEPS = $(subst .c,$(DEP), $(DBDINC_SRCS:$(APPSRC)/%=%))
 
 HEADERS += $(APPSRC)/sCalcPostfix.h
 HEADERS += $(APPSRC)/aCalcPostfix.h
 HEADERS += $(DBDINC_HDRS)
-
 
 SOURCES += $(APPSRC)/sCalcPostfix.c
 SOURCES += $(APPSRC)/sCalcPerform.c
@@ -44,7 +43,6 @@ SOURCES += $(APPSRC)/myFreeListLib.c
 SOURCES += $(APPSRC)/devsCalcoutSoft.c
 SOURCES += $(APPSRC)/devaCalcoutSoft.c
 SOURCES += $(APPSRC)/subAve.c
-SOURCES += $(APPSRC)/swaitRecord.c
 SOURCES += $(APPSRC)/editSseq.st
 SOURCES += $(APPSRC)/interp.c
 SOURCES += $(APPSRC)/arrayTest.c
@@ -55,9 +53,3 @@ SOURCES += $(DBDINC_SRCS)
 DBDS += $(APPSRC)/calcSupport_LOCAL.dbd
 DBDS += $(APPSRC)/calcSupport_withSNCSEQ.dbd
 DBDS += $(APPSRC)/calcSupport_withSSCAN.dbd
-
-
-$(DBDINC_DEPS): $(DBDINC_HDRS)
-
-.dbd.h:
-	$(DBTORECORDTYPEH)  $(USR_DBDFLAGS) -o $@ $<

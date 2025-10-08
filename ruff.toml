@@ -1,0 +1,28 @@
+target-version = "py37"  # this is the lowest allowed
+
+[lint]
+select = ["ALL"]
+ignore = [
+    "ANN101", "ANN102",  # to be deprecated
+    "D211",  # incompatible with D203
+    "D212",  # incompatible with D213
+    "COM812", "ISC001",  # may cause conflicts when used with the formatter
+    "FA100",  # may cause conflicts with py37
+    "D107",  # docstrings for __init__ methods
+    "D105",  # docstrings for magic methods
+    "TD",  # TODOs
+    "FIX",  # FIXMEs
+    "S603",  # untrusted input to `subprocess`
+    "TRY003",  # long messages outside of the exception class
+    "EM101", "EM102",  # exceptions may not use (f/) string literals
+    "G003",  # `logging` messages uses '+'
+    "D203",  # incompatibility between ruff lint and ruff format
+]
+
+[lint.per-file-ignores]
+"src/test/**" = [
+    "D",  # docstyle
+    "S101",  # asserts
+    "INP001",  # packages missing __init__.py
+    "PLR2004",  # magic values
+]
