@@ -1,26 +1,27 @@
+{% set name = "calc" %}
 {% set version = "3.7.5" %}
 
 package:
-  name: calc
+  name: "{{ name }}"
   version: "{{ version }}"
 
 source:
-  - url: https://github.com/epics-modules/calc/archive/refs/tags/R3-7-5.tar.gz
+  - url: https://github.com/epics-modules/{{ name }}/archive/refs/tags/R{{ version | replace('.', '-') }}.tar.gz
     sha256: 5cf1a7b3d444e763eb96ca5b9cdbcb9c29f5a6f9ac2b8d9cdb17a007d3fa8347
   - path: ../src
 
 build:
-  skip: True  # [ppc64]
-  number: 1
+  number: 5
   run_exports:
-    - {{ pin_subpackage('calc', max_pin='x.x.x.x') }}
+    - {{ pin_subpackage('calc', max_pin='x.x.x') }}
 
 requirements:
   build:
-    - make
-    - perl
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ stdlib('c') }}
+    - make
+    - perl
   host:
     - epics-base
     - require
@@ -30,8 +31,14 @@ requirements:
 test:
   requires:
     - run-iocsh
+    - pytest
+    - p4p
+    - numpy
+  source_files:
+    - test/
   commands:
     - run-iocsh -r calc
+    - pytest -v test/
 
 about:
   home: https://github.com/epics-modules/calc
