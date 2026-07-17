@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 import numpy as np
 import pytest
 from p4p.client.thread import Context
-from run_iocsh import IOC
+from run_iocsh import IOC, run_iocsh
 
 CTXT: Context = Context("pva")
 
@@ -66,59 +66,43 @@ dbLoadRecords("{db_file}", P={pv_prefix})
 """
 
 
-@pytest.fixture(scope="session")
-def running_ioc(tmp_path_factory: pytest.TempPathFactory) -> IOC:
-    tmp_path = tmp_path_factory.mktemp("ioc")
-
-    db_file = tmp_path / "test_read.db"
-    combined_db = f"{ACALCOUT_DB}\n{SCALCOUT_DB}\n{TRANSFORM_DB}"
-    db_file.write_text(combined_db)
-
-    cmd_file = tmp_path / "st_test.cmd"
-    cmd_file.write_text(CMD_TEMPLATE.format(db_file=db_file, pv_prefix="TestRead"))
-
-    ioc = IOC(cmd_file)
-    ioc.start()
-    yield ioc
-    ioc.exit()
-
-
-@pytest.mark.usefixtures("running_ioc")
-@pytest.mark.parametrize(
-    ("pv_name_read", "expected_val"),
-    [
-        ("TestRead:WAVE", [2.5, 2.5]),
-        ("TestRead:WritedTest", "TEST 1.234"),
-        ("TestRead:sumValue", 8.0),
-        ("TestRead:avgValue", 5.5),
-    ],
-)
-def test_read_variable(
-    pv_name_read: str, expected_val: str | float | Sequence[float] | Sequence[str]
-) -> None:
-    res = CTXT.get(pv_name_read)
-    # Handle different value types
-    if isinstance(res, np.ndarray):
-        assert np.allclose(res, expected_val)
-    else:
-        assert res == expected_val
-
-
-def start_and_stop_ioc(
-    db_content: str, tmp_path: Path, pv_prefix: str = "TestLoad"
-) -> tuple[str, str]:
+def write_ioc_files(db_content: str, tmp_path: Path, pv_prefix: str) -> Path:
     db_file = tmp_path / "test.db"
     db_file.write_text(db_content)
 
     cmd_file = tmp_path / "st_test.cmd"
     cmd_file.write_text(CMD_TEMPLATE.format(db_file=db_file, pv_prefix=pv_prefix))
 
-    ioc = IOC(cmd_file)
-    ioc.start()
-    ioc.exit()
-    ioc.check_output()
+    return cmd_file
 
-    return ioc.outs, ioc.errs
+
+def test_read_waveform(tmp_path: Path) -> None:
+    cmd_file = write_ioc_files(ACALCOUT_DB, tmp_path, pv_prefix="TestRead")
+
+    with IOC(cmd_file) as ioc:
+        ioc.wait_for_output()
+
+        assert np.allclose(CTXT.get("TestRead:WAVE"), [2.5, 2.5])
+
+
+@pytest.mark.parametrize(
+    ("db_content", "pv_name", "expected_val"),
+    [
+        (SCALCOUT_DB, "TestRead:WritedTest", "TEST 1.234"),
+        (TRANSFORM_DB, "TestRead:sumValue", 8.0),
+        (TRANSFORM_DB, "TestRead:avgValue", 5.5),
+    ],
+    ids=["scalcout", "transform-sum", "transform-avg"],
+)
+def test_read_variable(
+    db_content: str, pv_name: str, expected_val: str | float, tmp_path: Path
+) -> None:
+    cmd_file = write_ioc_files(db_content, tmp_path, pv_prefix="TestRead")
+
+    with IOC(cmd_file) as ioc:
+        ioc.wait_for_output()
+
+        assert CTXT.get(pv_name) == expected_val
 
 
 @pytest.mark.parametrize(
@@ -135,5 +119,8 @@ def start_and_stop_ioc(
     ],
 )
 def test_record_available(record_type: str, db_content: str, tmp_path: Path) -> None:
-    _, stderr = start_and_stop_ioc(db_content, tmp_path)
-    assert f'of unknown type "{record_type}"' not in stderr
+    cmd_file = write_ioc_files(db_content, tmp_path, pv_prefix="TestLoad")
+
+    ioc = run_iocsh(cmd_file, delay=0)
+
+    assert f'of unknown type "{record_type}"' not in ioc.stderr
