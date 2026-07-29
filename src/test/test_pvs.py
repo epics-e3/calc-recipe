@@ -79,9 +79,7 @@ def write_ioc_files(db_content: str, tmp_path: Path, pv_prefix: str) -> Path:
 def test_read_waveform(tmp_path: Path) -> None:
     cmd_file = write_ioc_files(ACALCOUT_DB, tmp_path, pv_prefix="TestRead")
 
-    with IOC(cmd_file) as ioc:
-        ioc.wait_for_output()
-
+    with IOC.ready(cmd_file):
         assert np.allclose(CTXT.get("TestRead:WAVE"), [2.5, 2.5])
 
 
@@ -99,9 +97,7 @@ def test_read_variable(
 ) -> None:
     cmd_file = write_ioc_files(db_content, tmp_path, pv_prefix="TestRead")
 
-    with IOC(cmd_file) as ioc:
-        ioc.wait_for_output()
-
+    with IOC.ready(cmd_file):
         assert CTXT.get(pv_name) == expected_val
 
 
@@ -121,6 +117,7 @@ def test_read_variable(
 def test_record_available(record_type: str, db_content: str, tmp_path: Path) -> None:
     cmd_file = write_ioc_files(db_content, tmp_path, pv_prefix="TestLoad")
 
-    ioc = run_iocsh(cmd_file, delay=0)
+    ioc = run_iocsh(cmd_file)
 
-    assert f'of unknown type "{record_type}"' not in ioc.stderr
+    # Check both stdout and stderr to be sure
+    assert f'of unknown type "{record_type}"' not in ioc.output
